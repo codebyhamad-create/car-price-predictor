@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Model Analysis — AutoValuate</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #0a0a0f; --surface: #f7f4ef; --amber: #d4851a;
+      --teal: #1a6b6b; --gold: #f0b429; --border: rgba(10,10,15,0.10);
+      --text-secondary: #4a4a6a; --surface-card: #faf8f5;
+      --shadow-md: 0 8px 32px rgba(10,10,15,0.10);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--surface); color: var(--ink); }
+    nav {
+      background: rgba(247,244,239,0.9); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border); padding: 0 clamp(1.5rem,5vw,4rem);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .nav-inner {
+      max-width: 1200px; margin: 0 auto; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; text-decoration: none; color: var(--ink); }
+    .logo span { color: var(--amber); }
+    .back-link { font-size: 0.85rem; color: var(--amber); text-decoration: none; font-weight: 500; }
+    .back-link:hover { text-decoration: underline; }
+    main { max-width: 1200px; margin: 0 auto; padding: clamp(2rem,5vw,4rem) clamp(1.5rem,5vw,4rem); }
+    .page-title {
+      font-family: 'Playfair Display', serif; font-size: clamp(2rem,4vw,3rem);
+      font-weight: 900; margin-bottom: 0.5rem; letter-spacing: -0.02em;
+    }
+    .page-title em { font-style: italic; color: var(--amber); }
+    .page-sub { font-size: 1rem; color: var(--text-secondary); margin-bottom: 3rem; }
+    .metrics-row {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.25rem; margin-bottom: 3rem;
+    }
+    .metric-card {
+      background: var(--surface-card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 1.5rem; box-shadow: var(--shadow-md);
+    }
+    .metric-card-label {
+      font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--text-secondary); margin-bottom: 8px;
+    }
+    .metric-card-value {
+      font-family: 'Playfair Display', serif; font-size: 1.9rem; font-weight: 700;
+    }
+    .metric-card-value.green { color: var(--teal); }
+    .metric-card-value.amber { color: var(--amber); }
+    .metric-card-sub { font-size: 0.78rem; color: #7a7a9a; margin-top: 4px; }
+    .chart-card {
+      background: var(--surface-card); border: 1px solid var(--border);
+      border-radius: 20px; padding: 2rem; box-shadow: var(--shadow-md); margin-bottom: 2rem;
+    }
+    .chart-title {
+      font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 600;
+      margin-bottom: 1.25rem; color: var(--ink);
+    }
+    .chart-card img { width: 100%; border-radius: 12px; }
+    .feat-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    .feat-table th {
+      text-align: left; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--text-secondary); padding: 10px 14px;
+      border-bottom: 2px solid var(--border);
+    }
+    .feat-table td { padding: 10px 14px; font-size: 0.88rem; border-bottom: 1px solid var(--border); }
+    .feat-table tr:last-child td { border-bottom: none; }
+    .feat-bar-wrap { width: 180px; height: 8px; background: rgba(10,10,15,0.08); border-radius: 100px; overflow: hidden; }
+    .feat-bar { height: 100%; border-radius: 100px; background: linear-gradient(90deg, var(--amber), var(--gold)); }
+    .rank { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1rem; color: var(--border); }
+    .algo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem; }
+    @media (max-width: 600px) { .algo-grid { grid-template-columns: 1fr; } }
+    .algo-row { display: flex; flex-direction: column; gap: 4px; }
+    .algo-key { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary); }
+    .algo-val { font-size: 0.95rem; font-weight: 500; color: var(--ink); }
+    footer { text-align: center; padding: 2.5rem 1rem; font-size: 0.82rem; color: #7a7a9a; border-top: 1px solid var(--border); margin-top: 4rem; }
+    footer strong { color: var(--amber); }
+  </style>
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo">Auto<span>Valuate</span></a>
+    <a href="index.html" class="back-link">Back to Predictor</a>
+  </div>
+</nav>
+
+<main>
+  <h1 class="page-title">Model <em>Analysis</em></h1>
+  <p class="page-sub">Full evaluation report for the Gradient Boosting Regressor trained on 1,276 Indian car listings.</p>
+
+  <!-- Key Metrics -->
+  <div class="metrics-row">
+    <div class="metric-card">
+      <div class="metric-card-label">R² Score</div>
+      <div class="metric-card-value green">0.9810</div>
+      <div class="metric-card-sub">98.1% variance explained</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-card-label">Mean Abs. Error</div>
+      <div class="metric-card-value amber">7.27L</div>
+      <div class="metric-card-sub">Rs. 7,26,257 avg. error</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-card-label">RMSE</div>
+      <div class="metric-card-value" style="color:#a3192e;">38.2L</div>
+      <div class="metric-card-sub">Skewed by ultra-luxury cars</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-card-label">MAPE</div>
+      <div class="metric-card-value" style="color:#2e2e42;">11.5%</div>
+      <div class="metric-card-sub">Mean absolute % error</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-card-label">Training Size</div>
+      <div class="metric-card-value" style="color:#1a6b6b;">1,020</div>
+      <div class="metric-card-sub">80% split from 1,276 rows</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-card-label">5-Fold CV R²</div>
+      <div class="metric-card-value green">0.835</div>
+      <div class="metric-card-sub">± 0.20 cross-validated</div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="chart-card">
+    <div class="chart-title">Four-Panel Model Evaluation</div>
+    <img src="model_analysis.png" alt="Model analysis charts including predicted vs actual, residuals, feature importance and price distribution" />
+  </div>
+
+  <!-- Feature Importance -->
+  <div class="chart-card">
+    <div class="chart-title">Feature Importance Ranking</div>
+    <table class="feat-table">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Feature</th>
+          <th>Importance</th>
+          <th>Relative Weight</th>
+        </tr>
+      </thead>
+      <tbody id="featTableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- Model Config -->
+  <div class="chart-card">
+    <div class="chart-title">Model Configuration</div>
+    <div class="algo-grid">
+      <div class="algo-row"><span class="algo-key">Algorithm</span><span class="algo-val">Gradient Boosting Regressor</span></div>
+      <div class="algo-row"><span class="algo-key">n_estimators</span><span class="algo-val">400 trees</span></div>
+      <div class="algo-row"><span class="algo-key">learning_rate</span><span class="algo-val">0.05</span></div>
+      <div class="algo-row"><span class="algo-key">max_depth</span><span class="algo-val">5</span></div>
+      <div class="algo-row"><span class="algo-key">subsample</span><span class="algo-val">0.80</span></div>
+      <div class="algo-row"><span class="algo-key">min_samples_leaf</span><span class="algo-val">5</span></div>
+      <div class="algo-row"><span class="algo-key">max_features</span><span class="algo-val">sqrt</span></div>
+      <div class="algo-row"><span class="algo-key">Target transform</span><span class="algo-val">log1p (log scale)</span></div>
+      <div class="algo-row"><span class="algo-key">Train/Test split</span><span class="algo-val">80% / 20%  (random_state=42)</span></div>
+      <div class="algo-row"><span class="algo-key">Total features</span><span class="algo-val">18 (13 numeric + 5 encoded)</span></div>
+    </div>
+  </div>
+</main>
+
+<footer>Built with love by <strong>Muhammad Irtaza</strong> — AutoValuate 2024</footer>
+
+<script>
+  const features = [
+    {name: 'Torque (Nm)', imp: 0.2443},
+    {name: 'Power (PS)', imp: 0.1629},
+    {name: 'Displacement (cc)', imp: 0.1374},
+    {name: 'Width (mm)', imp: 0.1023},
+    {name: 'Brand Goodwill Tier', imp: 0.0816},
+    {name: 'Wheelbase (mm)', imp: 0.0686},
+    {name: 'Fuel Tank (L)', imp: 0.0554},
+    {name: 'Length (mm)', imp: 0.0332},
+    {name: 'Body Type', imp: 0.0270},
+    {name: 'Height (mm)', imp: 0.0183},
+    {name: 'Make (Brand)', imp: 0.0141},
+    {name: 'Kerb Weight (kg)', imp: 0.0118},
+    {name: 'Mileage (km/L)', imp: 0.0104},
+    {name: 'Fuel Type', imp: 0.0097},
+    {name: 'Drivetrain', imp: 0.0082},
+    {name: 'Ground Clearance (mm)', imp: 0.0071},
+    {name: 'Seating Capacity', imp: 0.0054},
+    {name: 'Transmission', imp: 0.0030},
+  ];
+  const tbody = document.getElementById('featTableBody');
+  const maxImp = features[0].imp;
+  features.forEach((f, i) => {
+    const pct = (f.imp / maxImp * 100).toFixed(0);
+    tbody.innerHTML += `
+      <tr>
+        <td><span class="rank">${String(i+1).padStart(2,'0')}</span></td>
+        <td style="font-weight:500">${f.name}</td>
+        <td style="font-weight:600;color:${i<3?'#d4851a':'#2e2e42'}">${(f.imp*100).toFixed(2)}%</td>
+        <td><div class="feat-bar-wrap"><div class="feat-bar" style="width:${pct}%"></div></div></td>
+      </tr>`;
+  });
+</script>
+</body>
+</html>

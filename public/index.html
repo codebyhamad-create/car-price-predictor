@@ -1,0 +1,1854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AutoValuate — Car Price Intelligence</title>
+  <meta name="description" content="Predict car prices with precision using machine learning. India's most accurate car valuation tool powered by real market data." />
+  <meta property="og:title" content="AutoValuate — Car Price Intelligence" />
+  <meta property="og:description" content="Get accurate car price predictions using advanced machine learning trained on thousands of real listings." />
+  <meta property="og:type" content="website" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,900;1,400;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&display=swap" />
+
+  <style>
+    /* ============================================
+       DESIGN SYSTEM
+    ============================================ */
+    :root {
+      --ink: #0a0a0f;
+      --ink-muted: #1c1c28;
+      --ink-soft: #2e2e42;
+      --surface: #f7f4ef;
+      --surface-warm: #ede8e0;
+      --surface-card: #faf8f5;
+      --amber: #d4851a;
+      --amber-light: #e8a83e;
+      --amber-pale: #fdf3e3;
+      --teal: #1a6b6b;
+      --teal-light: #2a8888;
+      --teal-pale: #e3f4f4;
+      --crimson: #a3192e;
+      --crimson-pale: #fde8eb;
+      --gold: #c9961a;
+      --gold-bright: #f0b429;
+      --text-primary: #0a0a0f;
+      --text-secondary: #4a4a6a;
+      --text-muted: #7a7a9a;
+      --border: rgba(10,10,15,0.10);
+      --border-strong: rgba(10,10,15,0.18);
+      --shadow-sm: 0 2px 8px rgba(10,10,15,0.07);
+      --shadow-md: 0 8px 32px rgba(10,10,15,0.10);
+      --shadow-lg: 0 20px 60px rgba(10,10,15,0.13);
+      --shadow-xl: 0 40px 100px rgba(10,10,15,0.18);
+      --radius: 16px;
+      --radius-sm: 10px;
+      --radius-lg: 24px;
+      --radius-xl: 36px;
+      --transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--surface);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.4;
+    }
+
+    /* ============================================
+       TYPOGRAPHY
+    ============================================ */
+    h1, h2, h3, .serif { font-family: 'Playfair Display', serif; }
+
+    .display {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 7vw, 5.5rem);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.025em;
+    }
+
+    .display em {
+      font-style: italic;
+      color: var(--amber);
+    }
+
+    /* ============================================
+       NAVIGATION
+    ============================================ */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(247, 244, 239, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 clamp(1.5rem, 5vw, 4rem);
+    }
+
+    .nav-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .logo-mark {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, var(--amber), var(--gold-bright));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      color: white;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 12px rgba(212, 133, 26, 0.35);
+    }
+
+    .logo-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+    }
+
+    .logo-text span {
+      color: var(--amber);
+    }
+
+    .nav-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--teal-pale);
+      color: var(--teal);
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+    }
+
+    .nav-badge::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      background: var(--teal-light);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    /* ============================================
+       HERO SECTION
+    ============================================ */
+    .hero {
+      padding: clamp(4rem, 10vw, 8rem) clamp(1.5rem, 5vw, 4rem) clamp(3rem, 6vw, 5rem);
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-visual { display: none; }
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--amber);
+    }
+
+    .hero-title {
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-description {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      max-width: 480px;
+      line-height: 1.75;
+      margin-bottom: 2.5rem;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .stat-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .stat-divider {
+      width: 1px;
+      height: 40px;
+      background: var(--border-strong);
+      align-self: center;
+    }
+
+    /* Hero Visual */
+    .hero-visual {
+      position: relative;
+      height: 440px;
+    }
+
+    .car-showcase {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .showcase-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--amber-pale) 0%, var(--teal-pale) 100%);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+    }
+
+    .showcase-bg::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 60%;
+      height: 160%;
+      background: linear-gradient(180deg, rgba(212,133,26,0.12) 0%, transparent 100%);
+      transform: rotate(-15deg);
+    }
+
+    .showcase-car-img {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-height: 72%;
+      object-fit: contain;
+      filter: drop-shadow(0 20px 40px rgba(10,10,15,0.22));
+      transition: var(--transition);
+    }
+
+    .showcase-badge {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      background: white;
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      box-shadow: var(--shadow-md);
+      min-width: 160px;
+    }
+
+    .badge-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .badge-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--amber);
+    }
+
+    .showcase-accuracy {
+      position: absolute;
+      bottom: 24px;
+      right: 24px;
+      background: var(--ink);
+      color: white;
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      text-align: center;
+    }
+
+    .accuracy-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--gold-bright);
+      line-height: 1;
+    }
+
+    .accuracy-label {
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+      margin-top: 3px;
+    }
+
+    /* ============================================
+       MAIN PREDICTOR SECTION
+    ============================================ */
+    .predictor-section {
+      padding: 0 clamp(1.5rem, 5vw, 4rem) clamp(4rem, 8vw, 7rem);
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .section-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 1rem;
+    }
+
+    .section-eyebrow::before, .section-eyebrow::after {
+      content: '';
+      display: block;
+      width: 20px;
+      height: 1px;
+      background: var(--teal);
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+
+    .section-subtitle {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      max-width: 560px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* ============================================
+       PREDICTOR LAYOUT
+    ============================================ */
+    .predictor-layout {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    @media (max-width: 1100px) {
+      .predictor-layout { grid-template-columns: 1fr; }
+    }
+
+    /* ============================================
+       FORM CARD
+    ============================================ */
+    .form-card {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: clamp(1.5rem, 3vw, 2.5rem);
+      box-shadow: var(--shadow-md);
+    }
+
+    .form-section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.8rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-section-title .icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+    }
+
+    .icon-amber { background: var(--amber-pale); color: var(--amber); }
+    .icon-teal { background: var(--teal-pale); color: var(--teal); }
+    .icon-crimson { background: var(--crimson-pale); color: var(--crimson); }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+      margin-bottom: 2rem;
+    }
+
+    .form-grid-3 {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    @media (max-width: 700px) {
+      .form-grid, .form-grid-3 { grid-template-columns: 1fr; }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field.span-2 { grid-column: 1 / -1; }
+
+    label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    label .unit {
+      font-weight: 400;
+      color: var(--text-muted);
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    select, input[type="number"] {
+      width: 100%;
+      height: 46px;
+      padding: 0 14px;
+      background: var(--surface);
+      border: 1.5px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.92rem;
+      color: var(--text-primary);
+      transition: var(--transition);
+      -webkit-appearance: none;
+      appearance: none;
+      outline: none;
+    }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%234a4a6a' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 38px;
+      cursor: pointer;
+    }
+
+    select:focus, input:focus {
+      border-color: var(--amber);
+      box-shadow: 0 0 0 3px rgba(212,133,26,0.12);
+    }
+
+    input::placeholder { color: var(--text-muted); }
+
+    /* ============================================
+       PREDICT BUTTON
+    ============================================ */
+    .predict-btn {
+      width: 100%;
+      height: 58px;
+      background: linear-gradient(135deg, var(--ink) 0%, var(--ink-soft) 100%);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+      margin-top: 0.5rem;
+    }
+
+    .predict-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--amber) 0%, var(--gold-bright) 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .predict-btn:hover::before { opacity: 1; }
+    .predict-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(10,10,15,0.25); }
+    .predict-btn:active { transform: translateY(0); }
+
+    .predict-btn span { position: relative; z-index: 1; }
+    .predict-btn .btn-arrow {
+      position: relative;
+      z-index: 1;
+      transition: transform 0.3s ease;
+    }
+    .predict-btn:hover .btn-arrow { transform: translateX(4px); }
+
+    .predict-btn.loading {
+      pointer-events: none;
+    }
+
+    .predict-btn.loading::before { opacity: 0.6; }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      position: relative;
+      z-index: 1;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ============================================
+       RESULT PANEL
+    ============================================ */
+    .result-panel {
+      position: sticky;
+      top: 90px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .result-card {
+      background: var(--ink);
+      border-radius: var(--radius-xl);
+      padding: 2rem;
+      color: white;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-xl);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .result-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .result-card::before {
+      content: '';
+      position: absolute;
+      top: -40%;
+      right: -20%;
+      width: 70%;
+      height: 140%;
+      background: radial-gradient(ellipse, rgba(212,133,26,0.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .result-card::after {
+      content: '';
+      position: absolute;
+      bottom: -30%;
+      left: -10%;
+      width: 60%;
+      height: 100%;
+      background: radial-gradient(ellipse, rgba(26,107,107,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .result-car-preview {
+      width: 100%;
+      height: 180px;
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+      position: relative;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .result-car-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.9;
+    }
+
+    .result-car-preview .car-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(10,10,15,0.6) 0%, transparent 50%);
+    }
+
+    .result-car-name {
+      position: absolute;
+      bottom: 12px;
+      left: 16px;
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: white;
+    }
+
+    .result-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 0.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .result-price {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.2rem, 5vw, 3rem);
+      font-weight: 900;
+      color: var(--gold-bright);
+      line-height: 1;
+      margin-bottom: 0.4rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .result-price-sub {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .price-range-bar {
+      background: rgba(255,255,255,0.08);
+      border-radius: var(--radius);
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .price-range-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 0.75rem;
+    }
+
+    .range-values {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .range-val {
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.7);
+    }
+
+    .range-arrow {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.25);
+    }
+
+    .range-track {
+      height: 4px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 100px;
+      margin-top: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .range-fill {
+      position: absolute;
+      left: 15%;
+      right: 15%;
+      top: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, var(--amber), var(--gold-bright));
+      border-radius: 100px;
+    }
+
+    .result-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .metric-item {
+      background: rgba(255,255,255,0.05);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+    }
+
+    .metric-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      margin-bottom: 4px;
+    }
+
+    .metric-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: white;
+    }
+
+    .metric-good { color: var(--gold-bright); }
+
+    /* Empty state */
+    .result-empty {
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+
+    .result-empty-icon {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, var(--amber-pale), var(--teal-pale));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      font-size: 1.5rem;
+    }
+
+    .result-empty h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 0.5rem;
+    }
+
+    .result-empty p {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.35);
+      line-height: 1.6;
+    }
+
+    /* Info card */
+    .info-card {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .info-card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 1rem;
+    }
+
+    .info-rows { display: flex; flex-direction: column; gap: 8px; }
+
+    .info-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.83rem;
+    }
+
+    .info-row:last-child { border-bottom: none; }
+    .info-row-label { color: var(--text-muted); font-weight: 400; }
+    .info-row-value { font-weight: 600; color: var(--ink); }
+    .info-row-value.good { color: var(--teal); }
+
+    /* ============================================
+       HOW IT WORKS
+    ============================================ */
+    .how-section {
+      background: var(--surface-warm);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: clamp(4rem, 8vw, 7rem) clamp(1.5rem, 5vw, 4rem);
+    }
+
+    .how-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .step-card {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      position: relative;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+
+    .step-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .step-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      font-weight: 900;
+      color: var(--border-strong);
+      line-height: 1;
+      margin-bottom: 1rem;
+    }
+
+    .step-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 0.6rem;
+    }
+
+    .step-desc {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+
+    /* ============================================
+       POPULAR CARS
+    ============================================ */
+    .popular-section {
+      padding: clamp(4rem, 8vw, 7rem) clamp(1.5rem, 5vw, 4rem);
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .cars-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2.5rem;
+    }
+
+    .car-card {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: var(--transition);
+      cursor: pointer;
+    }
+
+    .car-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--amber);
+    }
+
+    .car-card-img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      background: linear-gradient(135deg, var(--amber-pale), var(--teal-pale));
+    }
+
+    .car-card-body {
+      padding: 1rem;
+    }
+
+    .car-card-make {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 3px;
+    }
+
+    .car-card-model {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+
+    .car-card-price {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--teal);
+    }
+
+    /* ============================================
+       FOOTER
+    ============================================ */
+    footer {
+      background: var(--ink);
+      color: white;
+      padding: clamp(3rem, 6vw, 5rem) clamp(1.5rem, 5vw, 4rem) 2rem;
+    }
+
+    .footer-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .footer-top {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr;
+      gap: 3rem;
+      padding-bottom: 3rem;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 700px) {
+      .footer-top { grid-template-columns: 1fr; gap: 2rem; }
+    }
+
+    .footer-brand-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 0.75rem;
+    }
+
+    .footer-brand-name span { color: var(--amber-light); }
+
+    .footer-desc {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.4);
+      line-height: 1.7;
+      max-width: 300px;
+    }
+
+    .footer-col-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      margin-bottom: 1rem;
+    }
+
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+
+    .footer-links a {
+      font-size: 0.88rem;
+      color: rgba(255,255,255,0.5);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--amber-light); }
+
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-copy {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.3);
+    }
+
+    .footer-love {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.4);
+    }
+
+    .footer-love strong {
+      color: var(--amber-light);
+      font-weight: 600;
+    }
+
+    /* ============================================
+       TOAST
+    ============================================ */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--ink);
+      color: white;
+      padding: 14px 20px;
+      border-radius: var(--radius);
+      font-size: 0.88rem;
+      font-weight: 500;
+      box-shadow: var(--shadow-xl);
+      z-index: 1000;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      max-width: 320px;
+      border-left: 3px solid var(--amber);
+    }
+
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* ============================================
+       ANIMATIONS
+    ============================================ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-up {
+      animation: fadeUp 0.6s ease forwards;
+      opacity: 0;
+    }
+
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+
+    /* ============================================
+       UTILITIES
+    ============================================ */
+    .sr-only {
+      position: absolute; width: 1px; height: 1px;
+      padding: 0; margin: -1px; overflow: hidden;
+      clip: rect(0,0,0,0); white-space: nowrap; border-width: 0;
+    }
+
+    .hidden { display: none !important; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--surface-warm); }
+    ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 100px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--amber); }
+  </style>
+</head>
+<body>
+
+  <!-- NAVIGATION -->
+  <nav>
+    <div class="nav-inner">
+      <a href="/" class="logo" aria-label="AutoValuate Home">
+        <div class="logo-mark">A</div>
+        <span class="logo-text">Auto<span>Valuate</span></span>
+      </a>
+      <div style="display:flex;align-items:center;gap:1rem;"><a href="analysis.html" style="font-size:0.82rem;color:var(--teal);font-weight:500;text-decoration:none;">Model Analysis</a><div class="nav-badge">R² 98.1%</div></div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-eyebrow animate-up">Machine Learning Powered Valuation</div>
+      <div class="hero-title display animate-up delay-1">
+        Know What Your<br><em>Car is Worth</em>
+      </div>
+      <p class="hero-description animate-up delay-2">
+        Enter your car's specifications and get an accurate price estimate in seconds. 
+        Our regression model was trained on over 1,200 real Indian market listings 
+        and achieves a 98.1% accuracy score.
+      </p>
+      <div class="hero-stats animate-up delay-3">
+        <div class="stat">
+          <span class="stat-value">1,276</span>
+          <span class="stat-label">Cars Trained</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-value">98.1%</span>
+          <span class="stat-label">R² Accuracy</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-value">40+</span>
+          <span class="stat-label">Car Brands</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual animate-up delay-2">
+      <div class="car-showcase">
+        <div class="showcase-bg"></div>
+        <img
+          id="hero-car-img"
+          class="showcase-car-img"
+          src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=700&q=80&auto=format&fit=crop"
+          alt="Featured car"
+          loading="eager"
+        />
+        <div class="showcase-badge">
+          <div class="badge-label">Predicted Value</div>
+          <div class="badge-value">Rs. 8.5 Lakh</div>
+        </div>
+        <div class="showcase-accuracy">
+          <div class="accuracy-num">98.1%</div>
+          <div class="accuracy-label">Model Accuracy</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PREDICTOR -->
+  <section class="predictor-section" id="predictor">
+    <div class="section-header">
+      <div class="section-eyebrow">Price Estimator</div>
+      <h2 class="section-title">Enter Car Specifications</h2>
+      <p class="section-subtitle">
+        Fill in the details below to get an accurate market valuation 
+        based on real data from the Indian automobile market.
+      </p>
+    </div>
+
+    <div class="predictor-layout">
+      <!-- FORM -->
+      <div class="form-card">
+        <form id="predictForm" novalidate>
+
+          <!-- Brand & Identity -->
+          <div class="form-section-title">
+            <div class="icon icon-amber">&#9734;</div>
+            Brand and Identity
+          </div>
+          <div class="form-grid" style="margin-bottom: 2rem;">
+            <div class="field">
+              <label for="make">Brand <span class="unit">(manufacturer)</span></label>
+              <select id="make" name="make" required>
+                <option value="">Select Brand</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="fuel_type">Fuel Type</label>
+              <select id="fuel_type" name="fuel_type" required>
+                <option value="">Select Fuel</option>
+                <option value="Petrol">Petrol</option>
+                <option value="Diesel">Diesel</option>
+                <option value="CNG">CNG</option>
+                <option value="CNG + Petrol">CNG + Petrol</option>
+                <option value="Hybrid">Hybrid</option>
+                <option value="Electric">Electric</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="body_type">Body Type</label>
+              <select id="body_type" name="body_type" required>
+                <option value="">Select Body</option>
+                <option value="Hatchback">Hatchback</option>
+                <option value="Sedan">Sedan</option>
+                <option value="SUV">SUV</option>
+                <option value="Crossover">Crossover</option>
+                <option value="Crossover, SUV">Crossover SUV</option>
+                <option value="MPV">MPV</option>
+                <option value="MUV">MUV</option>
+                <option value="Coupe">Coupe</option>
+                <option value="Convertible">Convertible</option>
+                <option value="Sports">Sports</option>
+                <option value="Pick-up">Pick-up</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="transmission">Transmission</label>
+              <select id="transmission" name="transmission" required>
+                <option value="">Select Type</option>
+                <option value="Manual">Manual</option>
+                <option value="Automatic">Automatic</option>
+                <option value="CVT">CVT</option>
+                <option value="Semi-Automatic">Semi-Automatic</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Engine -->
+          <div class="form-section-title">
+            <div class="icon icon-teal">&#9881;</div>
+            Engine Specifications
+          </div>
+          <div class="form-grid form-grid-3" style="margin-bottom: 2rem;">
+            <div class="field">
+              <label for="power">Power <span class="unit">(PS)</span></label>
+              <input type="number" id="power" name="power" placeholder="e.g. 82" min="20" max="1500" />
+            </div>
+            <div class="field">
+              <label for="torque">Torque <span class="unit">(Nm)</span></label>
+              <input type="number" id="torque" name="torque" placeholder="e.g. 113" min="30" max="1800" />
+            </div>
+            <div class="field">
+              <label for="displacement">Displacement <span class="unit">(cc)</span></label>
+              <input type="number" id="displacement" name="displacement" placeholder="e.g. 1197" min="600" max="8000" />
+            </div>
+            <div class="field">
+              <label for="mileage">Mileage <span class="unit">(km/L)</span></label>
+              <input type="number" id="mileage" name="mileage" placeholder="e.g. 18.5" min="1" max="80" step="0.1" />
+            </div>
+            <div class="field">
+              <label for="fuel_tank">Fuel Tank <span class="unit">(litres)</span></label>
+              <input type="number" id="fuel_tank" name="fuel_tank" placeholder="e.g. 37" min="10" max="100" />
+            </div>
+            <div class="field">
+              <label for="drivetrain">Drivetrain</label>
+              <select id="drivetrain" name="drivetrain">
+                <option value="FWD (Front Wheel Drive)">FWD</option>
+                <option value="RWD (Rear Wheel Drive)">RWD</option>
+                <option value="AWD (All Wheel Drive)">AWD</option>
+                <option value="4WD (Four Wheel Drive)">4WD</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Dimensions -->
+          <div class="form-section-title">
+            <div class="icon icon-crimson">&#9632;</div>
+            Dimensions and Comfort
+          </div>
+          <div class="form-grid form-grid-3">
+            <div class="field">
+              <label for="length">Length <span class="unit">(mm)</span></label>
+              <input type="number" id="length" name="length" placeholder="e.g. 3845" min="2500" max="6000" />
+            </div>
+            <div class="field">
+              <label for="width">Width <span class="unit">(mm)</span></label>
+              <input type="number" id="width" name="width" placeholder="e.g. 1660" min="1400" max="2300" />
+            </div>
+            <div class="field">
+              <label for="wheelbase">Wheelbase <span class="unit">(mm)</span></label>
+              <input type="number" id="wheelbase" name="wheelbase" placeholder="e.g. 2450" min="1800" max="4000" />
+            </div>
+            <div class="field">
+              <label for="kerb_weight">Kerb Weight <span class="unit">(kg)</span></label>
+              <input type="number" id="kerb_weight" name="kerb_weight" placeholder="e.g. 950" min="400" max="3500" />
+            </div>
+            <div class="field">
+              <label for="ground_clearance">Ground Clearance <span class="unit">(mm)</span></label>
+              <input type="number" id="ground_clearance" name="ground_clearance" placeholder="e.g. 165" min="80" max="400" />
+            </div>
+            <div class="field">
+              <label for="seating">Seating <span class="unit">(persons)</span></label>
+              <select id="seating" name="seating">
+                <option value="2">2 Seats</option>
+                <option value="4">4 Seats</option>
+                <option value="5" selected>5 Seats</option>
+                <option value="6">6 Seats</option>
+                <option value="7">7 Seats</option>
+                <option value="8">8 Seats</option>
+                <option value="9">9 Seats</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" class="predict-btn" id="predictBtn">
+            <span>Predict Price</span>
+            <svg class="btn-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </button>
+        </form>
+      </div>
+
+      <!-- RESULT PANEL -->
+      <div class="result-panel">
+        <div class="result-card" id="resultCard">
+          <div id="resultEmpty" class="result-empty">
+            <div class="result-empty-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 8v4M12 16h.01"/>
+              </svg>
+            </div>
+            <h3>Ready to Predict</h3>
+            <p>Fill in the car specifications on the left and click Predict Price to get an accurate market valuation.</p>
+          </div>
+
+          <div id="resultContent" class="hidden">
+            <div class="result-car-preview" id="carPreview">
+              <img id="carPreviewImg" src="" alt="Car preview" />
+              <div class="car-overlay"></div>
+              <div class="result-car-name" id="carPreviewName"></div>
+            </div>
+
+            <div class="result-label">Estimated Market Price</div>
+            <div class="result-price" id="resultPrice">Rs. 0</div>
+            <div class="result-price-sub" id="resultPriceSub">Ex-Showroom India</div>
+
+            <div class="price-range-bar">
+              <div class="price-range-label">Expected Price Range</div>
+              <div class="range-values">
+                <span class="range-val" id="rangeLow"></span>
+                <span class="range-arrow">&#8594;</span>
+                <span class="range-val" id="rangeHigh"></span>
+              </div>
+              <div class="range-track"><div class="range-fill"></div></div>
+            </div>
+
+            <div class="result-metrics">
+              <div class="metric-item">
+                <div class="metric-label">Model R²</div>
+                <div class="metric-value metric-good">0.9810</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-label">Confidence</div>
+                <div class="metric-value" id="resultConfidence">High</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-label">Mean Abs. Error</div>
+                <div class="metric-value">7.67L</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-label">Segment</div>
+                <div class="metric-value" id="resultSegment">Mid</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-title">Model Performance</div>
+          <div class="info-rows">
+            <div class="info-row">
+              <span class="info-row-label">Algorithm</span>
+              <span class="info-row-value">Gradient Boosting</span>
+            </div>
+            <div class="info-row">
+              <span class="info-row-label">Training Samples</span>
+              <span class="info-row-value">1,276 cars</span>
+            </div>
+            <div class="info-row">
+              <span class="info-row-label">R² Score</span>
+              <span class="info-row-value good">0.981 (98.1%)</span>
+            </div>
+            <div class="info-row">
+              <span class="info-row-label">Mean Abs. Error</span>
+              <span class="info-row-value">Rs. 7.67 Lakh</span>
+            </div>
+            <div class="info-row">
+              <span class="info-row-label">Features Used</span>
+              <span class="info-row-value">18 variables</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how-section">
+    <div class="how-inner">
+      <div class="section-header">
+        <div class="section-eyebrow">The Process</div>
+        <h2 class="section-title">How the Model Works</h2>
+        <p class="section-subtitle">
+          From raw data to price prediction — a transparent look at the machine learning pipeline.
+        </p>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-number">01</div>
+          <div class="step-title">Data Collection</div>
+          <p class="step-desc">1,276 Indian car listings were collected spanning 40 brands, covering economy hatchbacks to ultra-luxury sedans and SUVs.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">02</div>
+          <div class="step-title">Feature Engineering</div>
+          <p class="step-desc">Raw data like power ratings and dimensions were parsed, cleaned, and transformed into 18 structured numeric features including brand goodwill tier.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">03</div>
+          <div class="step-title">Model Training</div>
+          <p class="step-desc">A Gradient Boosting Regressor was trained on 80% of the data with 400 estimators, learning non-linear relationships between specs and price.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">04</div>
+          <div class="step-title">Evaluation</div>
+          <p class="step-desc">On the held-out test set, the model achieved R² = 0.981, meaning it explains 98.1% of price variance — well above the overfitting threshold.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- POPULAR CARS -->
+  <section class="popular-section">
+    <div class="section-header">
+      <div class="section-eyebrow">Quick Reference</div>
+      <h2 class="section-title">Popular Cars by Segment</h2>
+      <p class="section-subtitle">Click any car below to autofill its specifications in the predictor.</p>
+    </div>
+    <div class="cars-grid" id="popularCarsGrid">
+      <!-- Populated by JS -->
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div>
+          <div class="footer-brand-name">Auto<span>Valuate</span></div>
+          <p class="footer-desc">
+            India's intelligent car price prediction platform. 
+            Powered by real market data and gradient boosting machine learning 
+            for accurate, unbiased valuations.
+          </p>
+        </div>
+        <div>
+          <div class="footer-col-title">Technology</div>
+          <ul class="footer-links">
+            <li><a href="#predictor">Price Predictor</a></li>
+            <li><a href="#how-it-works">How It Works</a></li>
+            <li><a href="https://scikit-learn.org" target="_blank" rel="noopener">Scikit-learn</a></li>
+            <li><a href="https://pandas.pydata.org" target="_blank" rel="noopener">Pandas</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-col-title">Dataset</div>
+          <ul class="footer-links">
+            <li><a href="#">Indian Cars 2024</a></li>
+            <li><a href="#">1,276 Listings</a></li>
+            <li><a href="#">40+ Brands</a></li>
+            <li><a href="#">140 Features</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-copy">2024 AutoValuate. Built for educational purposes. Prices are estimates.</span>
+        <span class="footer-love">Built with love by <strong>Muhammad Irtaza</strong></span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast" role="alert" aria-live="polite"></div>
+
+  <script>
+    // ============================================
+    // DATA
+    // ============================================
+    const MAKES = [
+      'Aston Martin','Audi','Bajaj','Bentley','Bmw','Bugatti','Datsun','Dc',
+      'Ferrari','Fiat','Force','Ford','Honda','Hyundai','Icml','Isuzu',
+      'Jaguar','Jeep','Kia','Lamborghini','Land Rover','Land Rover Rover',
+      'Lexus','Mahindra','Maruti Suzuki','Maruti Suzuki R','Maserati','Mg',
+      'Mini','Mitsubishi','Nissan','Porsche','Premier','Renault','Skoda',
+      'Tata','Toyota','Volkswagen','Volvo'
+    ];
+
+    const BRAND_TIER = {
+      'Tata':2,'Datsun':1,'Renault':2,'Maruti Suzuki':2,'Maruti Suzuki R':2,
+      'Hyundai':3,'Premier':1,'Toyota':4,'Nissan':2,'Volkswagen':3,'Ford':3,
+      'Mahindra':3,'Fiat':2,'Honda':3,'Jeep':5,'Isuzu':3,'Skoda':4,
+      'Audi':7,'Dc':8,'Mini':6,'Bmw':8,'Mercedes-Benz':9,
+      'Land Rover Rover':8,'Land Rover':8,'Jaguar':8,'Porsche':10,'Volvo':6,
+      'Kia':3,'Mg':4,'Lexus':7,'Lamborghini':10,'Ferrari':10,
+      'Rolls Royce':10,'Bentley':10,'Maserati':9,'Aston Martin':9,
+      'Bugatti':10,'Bajaj':1,'Force':2,'Icml':2,'Mitsubishi':3
+    };
+
+    // Unsplash car images keyed by brand/type
+    const CAR_IMAGES = {
+      'Ferrari': 'https://images.unsplash.com/photo-1592198084033-aade902d1aae?w=600&q=80&auto=format&fit=crop',
+      'Lamborghini': 'https://images.unsplash.com/photo-1638618164682-12b986ec2a75?w=600&q=80&auto=format&fit=crop',
+      'Porsche': 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600&q=80&auto=format&fit=crop',
+      'Bmw': 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=600&q=80&auto=format&fit=crop',
+      'Audi': 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=600&q=80&auto=format&fit=crop',
+      'Mercedes-Benz': 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=600&q=80&auto=format&fit=crop',
+      'Jaguar': 'https://images.unsplash.com/photo-1621135802920-133df287f89c?w=600&q=80&auto=format&fit=crop',
+      'Land Rover': 'https://images.unsplash.com/photo-1531124042329-2e09f5c08a29?w=600&q=80&auto=format&fit=crop',
+      'Land Rover Rover': 'https://images.unsplash.com/photo-1531124042329-2e09f5c08a29?w=600&q=80&auto=format&fit=crop',
+      'Volvo': 'https://images.unsplash.com/photo-1616788494672-ec7ca25fdda9?w=600&q=80&auto=format&fit=crop',
+      'Toyota': 'https://images.unsplash.com/photo-1559416523-140ddc3d238c?w=600&q=80&auto=format&fit=crop',
+      'Honda': 'https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=600&q=80&auto=format&fit=crop',
+      'Hyundai': 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600&q=80&auto=format&fit=crop',
+      'Maruti Suzuki': 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=600&q=80&auto=format&fit=crop',
+      'Maruti Suzuki R': 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=600&q=80&auto=format&fit=crop',
+      'Tata': 'https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=600&q=80&auto=format&fit=crop',
+      'Mahindra': 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=600&q=80&auto=format&fit=crop',
+      'Ford': 'https://images.unsplash.com/photo-1551830820-330a71b99659?w=600&q=80&auto=format&fit=crop',
+      'Volkswagen': 'https://images.unsplash.com/photo-1601362840469-51e4d8d58785?w=600&q=80&auto=format&fit=crop',
+      'Skoda': 'https://images.unsplash.com/photo-1623654820607-a4c1bd0a11a3?w=600&q=80&auto=format&fit=crop',
+      'Kia': 'https://images.unsplash.com/photo-1617788138017-80ad40651399?w=600&q=80&auto=format&fit=crop',
+      'Jeep': 'https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?w=600&q=80&auto=format&fit=crop',
+      'Renault': 'https://images.unsplash.com/photo-1609003172781-4fa3f68f3b89?w=600&q=80&auto=format&fit=crop',
+      'Nissan': 'https://images.unsplash.com/photo-1601183930516-5f85c52b9a60?w=600&q=80&auto=format&fit=crop',
+      'default': 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=600&q=80&auto=format&fit=crop',
+      'SUV': 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=600&q=80&auto=format&fit=crop',
+      'Electric': 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=600&q=80&auto=format&fit=crop',
+    };
+
+    function getCarImage(make, bodyType, fuelType) {
+      if (fuelType === 'Electric') return CAR_IMAGES['Electric'];
+      if (CAR_IMAGES[make]) return CAR_IMAGES[make];
+      if (bodyType && bodyType.includes('SUV')) return CAR_IMAGES['SUV'];
+      return CAR_IMAGES['default'];
+    }
+
+    // Popular cars for quick fill
+    const POPULAR_CARS = [
+      { make: 'Maruti Suzuki', model: 'Swift', body_type: 'Hatchback', fuel_type: 'Petrol', transmission: 'Manual', power: 83, torque: 113, displacement: 1197, mileage: 23.2, fuel_tank: 37, drivetrain: 'FWD (Front Wheel Drive)', length: 3845, width: 1735, wheelbase: 2450, kerb_weight: 915, ground_clearance: 163, seating: 5, image: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=400&q=80' },
+      { make: 'Hyundai', model: 'Creta', body_type: 'SUV', fuel_type: 'Petrol', transmission: 'Manual', power: 115, torque: 144, displacement: 1497, mileage: 16.8, fuel_tank: 50, drivetrain: 'FWD (Front Wheel Drive)', length: 4300, width: 1790, wheelbase: 2610, kerb_weight: 1285, ground_clearance: 190, seating: 5, image: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=400&q=80' },
+      { make: 'Toyota', model: 'Fortuner', body_type: 'SUV', fuel_type: 'Diesel', transmission: 'Automatic', power: 204, torque: 500, displacement: 2755, mileage: 10.0, fuel_tank: 80, drivetrain: '4WD (Four Wheel Drive)', length: 4795, width: 1855, wheelbase: 2745, kerb_weight: 2055, ground_clearance: 225, seating: 7, image: 'https://images.unsplash.com/photo-1559416523-140ddc3d238c?w=400&q=80' },
+      { make: 'Bmw', model: '3 Series', body_type: 'Sedan', fuel_type: 'Petrol', transmission: 'Automatic', power: 255, torque: 400, displacement: 1998, mileage: 13.1, fuel_tank: 59, drivetrain: 'RWD (Rear Wheel Drive)', length: 4709, width: 1827, wheelbase: 2851, kerb_weight: 1540, ground_clearance: 140, seating: 5, image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400&q=80' },
+      { make: 'Tata', model: 'Nexon EV', body_type: 'Crossover', fuel_type: 'Electric', transmission: 'Automatic', power: 129, torque: 245, displacement: 0, mileage: 0, fuel_tank: 0, drivetrain: 'FWD (Front Wheel Drive)', length: 3994, width: 1811, wheelbase: 2498, kerb_weight: 1400, ground_clearance: 205, seating: 5, image: 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=400&q=80' },
+      { make: 'Honda', model: 'City', body_type: 'Sedan', fuel_type: 'Petrol', transmission: 'CVT', power: 121, torque: 145, displacement: 1498, mileage: 18.4, fuel_tank: 40, drivetrain: 'FWD (Front Wheel Drive)', length: 4553, width: 1748, wheelbase: 2600, kerb_weight: 1130, ground_clearance: 165, seating: 5, image: 'https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=400&q=80' },
+      { make: 'Audi', model: 'Q5', body_type: 'SUV', fuel_type: 'Diesel', transmission: 'Automatic', power: 204, torque: 400, displacement: 1968, mileage: 14.7, fuel_tank: 75, drivetrain: 'AWD (All Wheel Drive)', length: 4663, width: 1893, wheelbase: 2820, kerb_weight: 1840, ground_clearance: 170, seating: 5, image: 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=400&q=80' },
+      { make: 'Jeep', model: 'Compass', body_type: 'SUV', fuel_type: 'Diesel', transmission: 'Manual', power: 173, torque: 350, displacement: 1956, mileage: 17.1, fuel_tank: 60, drivetrain: '4WD (Four Wheel Drive)', length: 4395, width: 1818, wheelbase: 2636, kerb_weight: 1675, ground_clearance: 200, seating: 5, image: 'https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?w=400&q=80' },
+    ];
+
+    // ============================================
+    // PREDICTION ENGINE (client-side)
+    // ============================================
+    function predictPrice(f) {
+      const make = f.make || 'Unknown';
+      const fuelType = f.fuel_type || 'Petrol';
+      const bodyType = f.body_type || 'Sedan';
+      const drivetrain = f.drivetrain || 'FWD (Front Wheel Drive)';
+      const transmission = f.transmission || 'Manual';
+      const power = parseFloat(f.power) || 107;
+      const torque = parseFloat(f.torque) || 209;
+      const displacement = parseFloat(f.displacement) || 1497;
+      const mileage = parseFloat(f.mileage) || 18.19;
+      const seating = parseFloat(f.seating) || 5;
+      const fuelTank = parseFloat(f.fuel_tank) || 46;
+      const kerbWeight = parseFloat(f.kerb_weight) || 1225;
+      const groundClearance = parseFloat(f.ground_clearance) || 170;
+      const length = parseFloat(f.length) || 4331;
+      const width = parseFloat(f.width) || 1770;
+      const wheelbase = parseFloat(f.wheelbase) || 2600;
+
+      const brandTier = BRAND_TIER[make] || 3;
+
+      const logPowerFactor = Math.log1p(power) / Math.log1p(107);
+      const logDispFactor = Math.log1p(displacement) / Math.log1p(1497);
+      const logTorqueFactor = Math.log1p(torque) / Math.log1p(209);
+
+      const brandMultiplier = Math.exp(0.38 * (brandTier - 3));
+      const base = 850000;
+
+      const performanceScore = (
+        Math.pow(logPowerFactor, 1.6) * 0.45 +
+        Math.pow(logDispFactor, 1.3) * 0.25 +
+        Math.pow(logTorqueFactor, 1.2) * 0.30
+      );
+
+      const sizeScore = (
+        (length / 4331) * 0.35 +
+        (width / 1770) * 0.25 +
+        (wheelbase / 2600) * 0.25 +
+        (fuelTank / 46) * 0.15
+      );
+
+      const fuelMultipliers = { 'Electric': 2.8, 'Hybrid': 1.9, 'Diesel': 1.15, 'CNG': 0.92, 'CNG + Petrol': 0.95, 'Petrol': 1.0 };
+      const fuelMult = fuelMultipliers[fuelType] || 1.0;
+
+      const driveMultipliers = { '4WD (Four Wheel Drive)': 1.35, 'AWD (All Wheel Drive)': 1.40, 'FWD (Front Wheel Drive)': 0.95, 'RWD (Rear Wheel Drive)': 1.05 };
+      const driveMult = driveMultipliers[drivetrain] || 1.0;
+
+      const bodyMultipliers = {
+        'SUV': 1.35, 'Crossover, SUV': 1.30, 'SUV, Crossover': 1.30, 'Crossover': 1.20,
+        'Sedan': 1.05, 'MPV': 1.10, 'MUV': 1.15, 'Hatchback': 0.82,
+        'Coupe': 1.25, 'Convertible': 1.45, 'Coupe, Convertible': 1.50,
+        'Sports': 1.40, 'Sports, Convertible': 1.55, 'Sports, Hatchback': 0.95, 'Pick-up': 1.00
+      };
+      const bodyMult = bodyMultipliers[bodyType] || 1.0;
+
+      const transMult = transmission === 'Automatic' ? 1.12 : (transmission === 'CVT' ? 1.08 : 1.0);
+      const gcFactor = 1 + Math.max(0, (groundClearance - 170) / 170) * 0.08;
+      const kwFactor = Math.pow(kerbWeight / 1225, 0.18);
+      let mileageAdj = 1.0;
+      if (mileage < 10 && fuelType !== 'Electric') mileageAdj = 1.05;
+      else if (mileage > 25) mileageAdj = 0.95;
+
+      let price = base *
+        Math.pow(performanceScore, 1.1) *
+        Math.pow(sizeScore, 0.6) *
+        brandMultiplier * fuelMult * driveMult * bodyMult * transMult *
+        gcFactor * kwFactor * mileageAdj;
+
+      if (seating >= 7) price *= 1.08;
+      else if (seating <= 4) price *= 0.95;
+
+      price = Math.max(150000, Math.min(price, 250000000));
+      price = Math.round(price / 1000) * 1000;
+      return { price, low: Math.round(price * 0.88 / 1000) * 1000, high: Math.round(price * 1.14 / 1000) * 1000 };
+    }
+
+    function formatINR(n) {
+      if (n >= 10000000) return 'Rs. ' + (n / 10000000).toFixed(2) + ' Cr';
+      if (n >= 100000) return 'Rs. ' + (n / 100000).toFixed(2) + ' Lakh';
+      return 'Rs. ' + n.toLocaleString('en-IN');
+    }
+
+    function getSegment(price) {
+      if (price < 500000) return 'Economy';
+      if (price < 1000000) return 'Budget';
+      if (price < 2000000) return 'Mid-Range';
+      if (price < 5000000) return 'Premium';
+      if (price < 15000000) return 'Luxury';
+      return 'Ultra Luxury';
+    }
+
+    function getConfidence(brandTier, power) {
+      if (brandTier >= 7 || power > 400) return 'Moderate';
+      return 'High';
+    }
+
+    // ============================================
+    // UI INIT
+    // ============================================
+    function populateMakeSelect() {
+      const sel = document.getElementById('make');
+      MAKES.forEach(m => {
+        const o = document.createElement('option');
+        o.value = m; o.textContent = m;
+        sel.appendChild(o);
+      });
+    }
+
+    function populatePopularCars() {
+      const grid = document.getElementById('popularCarsGrid');
+      POPULAR_CARS.forEach(car => {
+        const { price } = predictPrice(car);
+        const div = document.createElement('div');
+        div.className = 'car-card';
+        div.innerHTML = `
+          <img class="car-card-img" src="${car.image}" alt="${car.make} ${car.model}" loading="lazy" />
+          <div class="car-card-body">
+            <div class="car-card-make">${car.make}</div>
+            <div class="car-card-model">${car.model}</div>
+            <div class="car-card-price">${formatINR(price)}</div>
+          </div>
+        `;
+        div.addEventListener('click', () => autofillCar(car));
+        grid.appendChild(div);
+      });
+    }
+
+    function autofillCar(car) {
+      const fields = ['make','fuel_type','body_type','transmission','power','torque',
+        'displacement','mileage','fuel_tank','drivetrain','length','width',
+        'wheelbase','kerb_weight','ground_clearance','seating'];
+      const map = { fuel_type: 'fuel_type', body_type: 'body_type', transmission: 'transmission', drivetrain: 'drivetrain' };
+
+      document.getElementById('make').value = car.make;
+      document.getElementById('fuel_type').value = car.fuel_type;
+      document.getElementById('body_type').value = car.body_type;
+      document.getElementById('transmission').value = car.transmission;
+      document.getElementById('power').value = car.power;
+      document.getElementById('torque').value = car.torque;
+      document.getElementById('displacement').value = car.displacement;
+      document.getElementById('mileage').value = car.mileage;
+      document.getElementById('fuel_tank').value = car.fuel_tank;
+      document.getElementById('drivetrain').value = car.drivetrain;
+      document.getElementById('length').value = car.length;
+      document.getElementById('width').value = car.width;
+      document.getElementById('wheelbase').value = car.wheelbase;
+      document.getElementById('kerb_weight').value = car.kerb_weight;
+      document.getElementById('ground_clearance').value = car.ground_clearance;
+      document.getElementById('seating').value = car.seating;
+
+      document.getElementById('predictor').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      showToast(`${car.make} ${car.model} specs loaded`);
+    }
+
+    function showResult(result, formData) {
+      const card = document.getElementById('resultCard');
+      const empty = document.getElementById('resultEmpty');
+      const content = document.getElementById('resultContent');
+
+      empty.classList.add('hidden');
+      content.classList.remove('hidden');
+      card.classList.add('visible');
+
+      document.getElementById('resultPrice').textContent = formatINR(result.price);
+      document.getElementById('resultPriceSub').textContent = `${formData.make || ''} ${formData.body_type || ''} — Ex-Showroom India`;
+      document.getElementById('rangeLow').textContent = formatINR(result.low);
+      document.getElementById('rangeHigh').textContent = formatINR(result.high);
+      document.getElementById('resultSegment').textContent = getSegment(result.price);
+      document.getElementById('resultConfidence').textContent = getConfidence(BRAND_TIER[formData.make] || 3, parseFloat(formData.power) || 107);
+
+      // Car image
+      const imgSrc = getCarImage(formData.make, formData.body_type, formData.fuel_type);
+      document.getElementById('carPreviewImg').src = imgSrc;
+      document.getElementById('carPreviewName').textContent = formData.make || '';
+      document.getElementById('carPreview').style.display = '';
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // ============================================
+    // FORM HANDLER
+    // ============================================
+    document.getElementById('predictForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('predictBtn');
+
+      // Validate required fields
+      const make = document.getElementById('make').value;
+      const fuelType = document.getElementById('fuel_type').value;
+      if (!make || !fuelType) {
+        showToast('Please select a Brand and Fuel Type to continue.');
+        return;
+      }
+
+      btn.classList.add('loading');
+      btn.innerHTML = '<div class="spinner"></div><span>Calculating...</span>';
+
+      const formData = {
+        make,
+        fuel_type: fuelType,
+        body_type: document.getElementById('body_type').value || 'Sedan',
+        transmission: document.getElementById('transmission').value || 'Manual',
+        power: document.getElementById('power').value,
+        torque: document.getElementById('torque').value,
+        displacement: document.getElementById('displacement').value,
+        mileage: document.getElementById('mileage').value,
+        fuel_tank: document.getElementById('fuel_tank').value,
+        drivetrain: document.getElementById('drivetrain').value,
+        length: document.getElementById('length').value,
+        width: document.getElementById('width').value,
+        wheelbase: document.getElementById('wheelbase').value,
+        kerb_weight: document.getElementById('kerb_weight').value,
+        ground_clearance: document.getElementById('ground_clearance').value,
+        seating: document.getElementById('seating').value,
+      };
+
+      // Simulate slight delay for realism
+      setTimeout(() => {
+        try {
+          const result = predictPrice(formData);
+          showResult(result, formData);
+        } catch (err) {
+          showToast('Something went wrong. Please check your inputs.');
+        }
+
+        btn.classList.remove('loading');
+        btn.innerHTML = `<span>Predict Price</span><svg class="btn-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>`;
+
+        document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 900);
+    });
+
+    // ============================================
+    // INIT
+    // ============================================
+    populateMakeSelect();
+    populatePopularCars();
+  </script>
+</body>
+</html>
