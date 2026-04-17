@@ -1,0 +1,20 @@
+{
+  "Power_PS": 107.0,
+  "Torque_Nm": 209.0,
+  "Displacement_cc": 1497.0,
+  "Length_mm": 4331.0,
+  "Width_mm": 1770.0,
+  "Height_mm": 1557.0,
+  "Wheelbase_mm": 2600.0,
+  "Fuel_Tank_L": 46.0,
+  "Kerb_Weight_kg": 1225.0,
+  "Ground_Clearance_mm": 170.0,
+  "Mileage": 18.19,
+  "Brand_Tier": 3.0,
+  "Seating_Capacity": 5.0,
+  "Make_enc": 24.0,
+  "Fuel_Type_enc": 5.0,
+  "Body_Type_enc": 9.0,
+  "Drivetrain_enc": 2.0,
+  "Type_enc": 4.0
+}

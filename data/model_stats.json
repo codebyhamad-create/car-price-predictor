@@ -1,0 +1,30 @@
+{
+  "r2_score": 0.9802340480601092,
+  "mae": 726257.1359569265,
+  "rmse": 3824451.2644571927,
+  "mape": 11.473581727382957,
+  "cv_mean": 0.8351535155619569,
+  "cv_std": 0.1997664416447022,
+  "n_train": 1020,
+  "n_test": 256,
+  "features": [
+    "Power_PS",
+    "Torque_Nm",
+    "Displacement_cc",
+    "Length_mm",
+    "Width_mm",
+    "Height_mm",
+    "Wheelbase_mm",
+    "Fuel_Tank_L",
+    "Kerb_Weight_kg",
+    "Ground_Clearance_mm",
+    "Mileage",
+    "Brand_Tier",
+    "Seating_Capacity",
+    "Make_enc",
+    "Fuel_Type_enc",
+    "Body_Type_enc",
+    "Drivetrain_enc",
+    "Type_enc"
+  ]
+}
