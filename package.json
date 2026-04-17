@@ -1,0 +1,30 @@
+{
+  "name": "car-price-predictor",
+  "version": "1.0.0",
+  "description": "Car Price Prediction Web App using Machine Learning — Indian automobile market valuation tool",
+  "private": true,
+  "scripts": {
+    "train": "python3 train_model.py",
+    "dev": "netlify dev",
+    "build": "echo 'Static site - no build step required'",
+    "deploy": "netlify deploy --prod"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  },
+  "keywords": [
+    "car-price-prediction",
+    "machine-learning",
+    "gradient-boosting",
+    "scikit-learn",
+    "indian-cars",
+    "regression",
+    "netlify"
+  ],
+  "author": "Muhammad Irtaza",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
