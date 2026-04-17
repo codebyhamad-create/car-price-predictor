@@ -7,6 +7,7 @@ A production-ready web application that predicts Indian car prices using a train
 ## Live Demo
 
 Deploy to Netlify in one click and share the link with anyone for free.
+https://car-price-predictor-hamad.netlify.app/
 
 ---
 
